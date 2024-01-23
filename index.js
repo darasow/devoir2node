@@ -219,16 +219,58 @@ app.get("/delete/:id", (req, res) => {
   
 })
 
+app.get("/motDePasse", (req, res) => {
+  try {
+      
+    res.render("motDePasseOublier")
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur interne du server');
+  }
+})
+
+app.post("/submit/motdepasse",  (req, res) => {
+
+  var context
+  var motdepasse = null
+  const { email} = req.body;
+  if (!email) {
+      context = {
+       message: 'Donner votre email',
+       email : email,
+     }
+    return res.status(400).render('motDePasseOublier', context); 
+   }
+   if (Array.isArray(req.session.userData)) {
+    for (const user of req.session.userData) {
+        if (user.email === email) {
+            motdepasse = user.password
+            context = {
+              passwordTrouver: `Votre mot de passe est :  ${motdepasse}`,
+            }
+            return res.status(400).render('motDePasseOublier', context); 
+        }
+    }
+}
+   if (motdepasse == null) {
+      context = {
+       message: "L'email n'existe pas",
+       email : email,
+     }
+     return res.status(400).render('motDePasseOublier', context); 
+   }
+
+});
+
 
 app.get("*", (req, res) =>{
   
    res.send("update")
 })
 
+
+
   app.listen(port, () => {
     console.log(`Serveur démarré sur http://localhost:${port}`);
   });
-
-
-
-
